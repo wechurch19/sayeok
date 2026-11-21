@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>우리는교회 사역신청서</title>
+<meta name="description" content="우리는교회 사역신청서">
+<meta name="theme-color" content="#FFB400">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+  :root{
+    --yellow:#FFB400; --yellow-soft:#FFF1C2; --red:#E31B23; --ink:#141414; --muted:#6b6b6b;
+    --line:#e8dfc6; --bg:#FFFBEE; --card:#fff; --ok:#2f8f5b;
+    --accent:var(--red); --accent-soft:var(--yellow-soft);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+       background:var(--bg);color:var(--ink);line-height:1.5;-webkit-text-size-adjust:100%}
+  .wrap{max-width:760px;margin:0 auto;padding:16px 14px 110px}
+  .hidden{display:none !important}
+
+  /* 필름 가장자리 띠 */
+  .film{height:22px;background:var(--ink);position:relative}
+  .film::after{content:"";position:absolute;left:0;right:0;top:6px;bottom:6px;
+    background:repeating-linear-gradient(90deg,var(--yellow) 0 12px,transparent 12px 26px);border-radius:2px}
+
+  /* 입장 화면 */
+  #gate{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+        text-align:center;padding:60px 24px;background:var(--yellow);position:relative}
+  #gate .film{position:absolute;left:0;right:0}
+  #gate .film.top{top:0} #gate .film.bottom{bottom:0}
+  #gate .church{display:inline-block;background:var(--ink);color:var(--yellow);font-weight:800;
+        letter-spacing:.25em;font-size:14px;padding:6px 14px 6px 18px;border-radius:4px;margin-bottom:16px}
+  #gate h1{font-size:clamp(34px,10vw,60px);font-weight:900;letter-spacing:-.03em;line-height:1.1;margin:0 0 10px;color:var(--ink)}
+  #gate .sub{color:#3a2c00;margin-bottom:38px;font-weight:600}
+  #enterBtn{font:inherit;font-size:clamp(18px,5vw,22px);font-weight:900;color:#fff;background:var(--red);
+            border:3px solid var(--ink);border-radius:10px;padding:20px 34px;width:min(420px,100%);cursor:pointer;
+            box-shadow:6px 6px 0 var(--ink);transition:transform .08s,box-shadow .08s}
+  #enterBtn:active{transform:translate(4px,4px);box-shadow:2px 2px 0 var(--ink)}
+  #enterBtn:disabled{background:#b9a77a;box-shadow:none;cursor:wait}
+
+  /* 신청서 상단 */
+  .hero{margin:-16px -14px 20px;background:var(--yellow);text-align:center}
+  .hero-in{padding:18px 14px 20px}
+  .kicker{display:inline-block;background:var(--ink);color:var(--yellow);font-weight:800;letter-spacing:.25em;
+          font-size:12px;padding:4px 12px 4px 15px;border-radius:3px;margin-bottom:8px}
+  h2.title{font-size:clamp(28px,8vw,42px);font-weight:900;letter-spacing:-.03em;margin:0;color:var(--ink)}
+
+  .card{background:var(--card);border:2px solid var(--ink);border-radius:10px;padding:16px;margin-bottom:16px;
+        box-shadow:4px 4px 0 var(--yellow)}
+  .field{margin-bottom:14px}
+  .field:last-child{margin-bottom:0}
+  label.lb,.lb{display:block;font-weight:800;margin-bottom:6px}
+  input[type=text],input[type=tel],textarea{
+    width:100%;font:inherit;font-size:16px;padding:12px;border:2px solid var(--line);border-radius:8px;background:#fff}
+  input[type=text]:focus,input[type=tel]:focus,textarea:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px var(--yellow)}
+  .row2{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:560px){.row2{grid-template-columns:1fr 1fr}}
+
+  .hint{background:var(--yellow-soft);border-left:6px solid var(--red);border-radius:6px;padding:10px 12px;font-size:14px;margin-bottom:16px}
+
+  .group-head{margin:26px 2px 10px}
+  .group-head h3{display:inline-block;margin:0 0 4px;font-size:18px;font-weight:900;background:var(--ink);
+                 color:var(--yellow);padding:5px 14px;border-radius:4px}
+  .group-head small{display:block;color:var(--muted)}
+
+  .ministry{background:var(--card);border:2px solid var(--line);border-radius:10px;margin-bottom:10px;overflow:hidden;
+            transition:border-color .15s,box-shadow .15s}
+  .ministry.on{border-color:var(--ink);background:#fffdf5;box-shadow:4px 4px 0 var(--yellow)}
+  .m-top{display:flex;align-items:center;gap:12px;padding:14px;cursor:pointer;user-select:none}
+  .m-top input{width:24px;height:24px;accent-color:var(--red);flex:none}
+  .m-name{font-weight:800;font-size:17px}
+  .m-info{color:var(--muted);font-size:14px}
+  .m-detail{padding:0 14px 14px 50px;display:none}
+  .ministry.on .m-detail{display:block}
+  .m-detail .sub{font-size:13px;font-weight:800;color:var(--red);margin:10px 0 6px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{position:relative}
+  .chip input{position:absolute;opacity:0;pointer-events:none}
+  .chip span{display:inline-block;padding:9px 14px;border:2px solid var(--ink);border-radius:6px;
+             background:#fff;font-size:15px;font-weight:600;cursor:pointer}
+  .chip input:checked + span{background:var(--red);border-color:var(--ink);color:#fff;font-weight:800}
+  .chip input:focus-visible + span{outline:3px solid var(--yellow)}
+
+  /* 사역모습 버튼 / 사진 보기 */
+  .m-row{display:flex;align-items:center}
+  .m-row .m-top{flex:1;min-width:0}
+  .gal-btn{font:inherit;font-size:14px;font-weight:800;background:var(--ink);color:var(--yellow);border:0;
+           border-radius:6px;padding:10px 12px;margin-right:12px;white-space:nowrap;cursor:pointer;flex:none}
+  .gal{position:fixed;inset:0;background:var(--bg);z-index:30;display:flex;flex-direction:column}
+  .gal-head{background:var(--yellow);display:flex;align-items:center;justify-content:space-between;
+            padding:12px 14px;border-bottom:3px solid var(--ink)}
+  .gal-head b{font-size:19px;font-weight:900}
+  .gal-head button{font:inherit;font-weight:800;background:var(--ink);color:var(--yellow);border:0;border-radius:6px;padding:9px 14px;cursor:pointer}
+  .gal-body{flex:1;overflow:auto;padding:12px;display:flex;flex-wrap:wrap;gap:10px;align-content:flex-start}
+  .gal-msg{width:100%;text-align:center;color:var(--muted);padding:50px 10px}
+  .th{width:calc(50% - 5px);background:#fff;border:2px solid var(--ink);border-radius:8px;overflow:hidden;cursor:pointer;padding:0;text-align:left;font:inherit}
+  @media(min-width:640px){.th{width:calc(33.333% - 6.7px)}}
+  .th .ph{position:relative;width:100%;padding-top:100%;background:#eee}
+  .th img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;display:block}
+  .th span{display:block;padding:6px 8px;font-size:13px}
+  .pv{position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:40;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;padding:10px}
+  .pv img{max-width:100%;max-height:78vh;object-fit:contain;border-radius:4px}
+  .pv-cap{color:#fff;margin-top:12px;text-align:center;font-size:15px;min-height:22px}
+  .pv button{position:absolute;font:inherit;font-weight:900;line-height:1;padding:0 0 4px;background:var(--yellow);color:var(--ink);border:0;
+             border-radius:50%;width:46px;height:46px;font-size:30px;cursor:pointer}
+  .pv .pv-x{top:12px;right:12px} .pv .pv-p{left:10px;top:50%} .pv .pv-n{right:10px;top:50%}
+
+  .ver{font-size:12px;color:#5b4a14;margin-top:22px;opacity:.85}
+  .ver-warn{background:#fff;border:3px solid var(--red);color:#7a0d12;border-radius:8px;padding:10px 12px;margin:18px auto 0;
+            max-width:420px;font-size:14px;font-weight:700;text-align:left;line-height:1.5}
+  .formver{text-align:center;color:var(--muted);font-size:12px;margin:6px 0 10px}
+  .foot-boxes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:22px 0 6px}
+  .foot-box{font:inherit;text-align:left;border:2px solid var(--ink);border-radius:10px;padding:14px;cursor:pointer;
+            background:var(--yellow);color:var(--ink);box-shadow:4px 4px 0 var(--ink)}
+  .foot-box b{display:block;font-size:16px;font-weight:900}
+  .foot-box small{display:block;font-size:12px;margin-top:3px;opacity:.85}
+  .foot-box.dark{background:var(--ink);color:var(--yellow);box-shadow:4px 4px 0 var(--yellow)}
+  .foot-box:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+  .stat-body{display:block !important}
+  .stat-sum{background:var(--yellow-soft);border-left:6px solid var(--red);border-radius:6px;padding:10px 12px;margin-bottom:12px}
+  .stat-g{display:inline-block;background:var(--ink);color:var(--yellow);font-weight:900;border-radius:4px;padding:4px 12px;margin:14px 0 6px}
+  .stat-row{display:flex;align-items:center;gap:10px;padding:7px 2px;border-bottom:1px solid var(--line)}
+  .stat-n{flex:0 0 38%;font-weight:700;font-size:15px}
+  .stat-bar{flex:1;height:12px;background:#efe7d0;border-radius:6px;overflow:hidden}
+  .stat-bar i{display:block;height:100%;background:var(--red);border-radius:6px}
+  .stat-c{flex:0 0 auto;min-width:44px;text-align:right;font-weight:900}
+  .stat-note{color:var(--muted);font-size:12px;margin-top:16px}
+  .login{max-width:360px;margin:40px auto;text-align:center}
+  .login input{width:100%;font:inherit;font-size:16px;padding:12px;border:2px solid var(--ink);border-radius:8px;margin:10px 0}
+  .login button{font:inherit;font-weight:900;background:var(--red);color:#fff;border:2px solid var(--ink);border-radius:8px;padding:12px 22px;cursor:pointer}
+  .login .msg{color:#c0152b;font-weight:700;min-height:22px}
+  .tabs{display:flex;gap:8px;margin-bottom:10px}
+  .tabs button{flex:1;font:inherit;font-weight:800;border:2px solid var(--ink);background:#fff;border-radius:6px;padding:9px;cursor:pointer}
+  .tabs button.on{background:var(--ink);color:var(--yellow)}
+  .tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+  .tools input{flex:1;min-width:140px;font:inherit;font-size:15px;padding:10px;border:2px solid var(--line);border-radius:8px}
+  .tools a,.tools button{font:inherit;font-size:14px;font-weight:800;text-decoration:none;background:var(--yellow);color:var(--ink);
+                         border:2px solid var(--ink);border-radius:6px;padding:9px 12px;cursor:pointer;white-space:nowrap}
+  .pc{background:#fff;border:2px solid var(--ink);border-radius:10px;padding:12px;margin-bottom:10px}
+  .pc-h{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+  .pc-h b{font-size:17px}
+  .pc-m{color:var(--muted);font-size:13px;margin:2px 0 6px}
+  .pc ul{margin:0;padding-left:18px;font-size:14px}
+  .mg{background:#fff;border:2px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+  .mg b{font-size:15px} .mg .cnt{color:var(--red);font-weight:900}
+  .mg div{font-size:13.5px;color:#333;margin-top:4px;line-height:1.6}
+  .gal-tools{display:flex;gap:8px}
+  .adm{width:100%;background:var(--yellow-soft);border:2px dashed var(--ink);border-radius:8px;padding:10px;
+       display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:14px}
+  .up-btn{display:inline-block;background:var(--red);color:#fff;font-weight:800;border-radius:6px;padding:10px 14px;cursor:pointer}
+  .adm-row{display:flex;gap:6px;padding:0 8px 8px}
+  .adm-row button{font:inherit;font-size:13px;font-weight:700;border:2px solid var(--ink);background:#fff;border-radius:5px;padding:5px 10px;cursor:pointer}
+  .adm-row button.del{background:var(--red);color:#fff}
+
+  /* 하단 고정 제출 바 */
+  .submitbar{position:fixed;left:0;right:0;bottom:0;background:var(--ink);
+             padding:10px 14px calc(10px + env(safe-area-inset-bottom));z-index:10}
+  .submitbar .in{max-width:760px;margin:0 auto;display:flex;gap:10px;align-items:center}
+  .count{flex:1;font-size:14px;color:#ddd}
+  .count b{color:var(--yellow);font-size:20px}
+  #submitBtn{font:inherit;font-size:17px;font-weight:900;color:var(--ink);background:var(--yellow);border:0;
+             border-radius:8px;padding:14px 26px;cursor:pointer}
+  #submitBtn:disabled{background:#8a7a4a}
+  .err{color:#c0152b;font-weight:800;margin:8px 2px;display:none}
+
+  /* 완료 */
+  #done{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+        padding:24px;background:var(--yellow)}
+  #done .ck{width:76px;height:76px;border-radius:50%;background:var(--ink);color:var(--yellow);font-size:42px;
+            display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+  #done h2{font-weight:900;margin:0 0 6px}
+  #done button{font:inherit;margin-top:22px;padding:13px 24px;border-radius:8px;border:3px solid var(--ink);
+               background:var(--red);color:#fff;font-weight:900;cursor:pointer;box-shadow:4px 4px 0 var(--ink)}
+</style>
+</head>
+<body>
+
+<!-- 입장 화면 : 비밀번호 없이 버튼만 누르면 입장 -->
+<section id="gate">
+  <div class="film top"></div>
+  <div class="church">우리는교회</div>
+  <h1 id="gateTitle">사역신청서</h1>
+  <div class="sub">섬기고 싶은 사역에 함께해 주세요</div>
+  <button id="enterBtn" disabled>불러오는 중...</button>
+  <div id="verWarn"></div>
+  <div class="ver" id="verText"></div>
+  <div class="film bottom"></div>
+</section>
+
+<!-- 신청서 -->
+<main id="formPage" class="wrap hidden">
+  <div class="hero"><div class="film"></div><div class="hero-in"><div class="kicker">우리는교회</div><h2 class="title" id="formTitle">사역신청서</h2></div><div class="film"></div></div>
+
+  <div class="card">
+    <div class="field">
+      <label class="lb" for="name">성명</label>
+      <input type="text" id="name" autocomplete="name" placeholder="이름을 입력하세요">
+    </div>
+    <div class="field">
+      <label class="lb" for="phone">연락처</label>
+      <input type="tel" id="phone" autocomplete="tel" inputmode="tel" placeholder="010-0000-0000">
+    </div>
+    <div class="row2">
+      <div class="field">
+        <div class="lb">세례</div>
+        <div class="chips">
+          <label class="chip"><input type="radio" name="baptism" value="세례교인"><span>세례교인</span></label>
+          <label class="chip"><input type="radio" name="baptism" value="미세례"><span>미세례</span></label>
+        </div>
+      </div>
+      <div class="field">
+        <div class="lb">새가족교육</div>
+        <div class="chips">
+          <label class="chip"><input type="radio" name="newFamily" value="이수"><span>이수</span></label>
+          <label class="chip"><input type="radio" name="newFamily" value="미이수"><span>미이수</span></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hint">봉사를 희망하는 부서와 사역을 선택해 주세요. <b>여러 개를 함께 신청</b>할 수 있습니다.</div>
+
+  <div id="groups"></div>
+
+  <div class="card">
+    <label class="lb" for="etc">기타 희망 사역</label>
+    <input type="text" id="etc" placeholder="위에 없는 사역이 있다면 적어 주세요">
+  </div>
+
+  <div class="err" id="err"></div>
+
+  <div class="foot-boxes">
+    <button type="button" class="foot-box" id="statBtn"><b>사역별 신청 현황</b><small>어떤 사역에 몇 명이 신청했는지 보기</small></button>
+    <button type="button" class="foot-box dark" id="admBtn"><b>관리자모드</b><small>신청 목록 보기 (비밀번호)</small></button>
+  </div>
+  <div class="formver" id="formVer"></div>
+</main>
+
+<div class="submitbar hidden" id="bar">
+  <div class="in">
+    <div class="count">선택한 사역 <b id="cnt">0</b>개</div>
+    <button id="submitBtn">신청하기</button>
+  </div>
+</div>
+
+<!-- 사역별 신청 현황 / 관리자모드 -->
+<div id="stat" class="gal hidden">
+  <div class="gal-head"><b>사역별 신청 현황</b><div class="gal-tools"><button type="button" id="statClose">닫기 ✕</button></div></div>
+  <div id="statBody" class="gal-body stat-body"></div>
+</div>
+<div id="adp" class="gal hidden">
+  <div class="gal-head"><b>관리자모드</b><div class="gal-tools"><button type="button" id="adpClose">닫기 ✕</button></div></div>
+  <div id="adpBody" class="gal-body stat-body"></div>
+</div>
+
+<!-- 사역모습 사진 -->
+<div id="gal" class="gal hidden">
+  <div class="gal-head"><b id="galTitle">사역모습</b><div class="gal-tools"><button type="button" id="galAdmin">관리자</button><button type="button" id="galClose">닫기 ✕</button></div></div>
+  <div id="galBody" class="gal-body"></div>
+</div>
+<div id="lb" class="pv hidden">
+  <button type="button" class="pv-x" id="lbX" aria-label="닫기">✕</button>
+  <button type="button" class="pv-p" id="lbP" aria-label="이전">‹</button>
+  <img id="lbImg" alt="">
+  <button type="button" class="pv-n" id="lbN" aria-label="다음">›</button>
+  <div class="pv-cap" id="lbCap"></div>
+</div>
+
+<!-- 완료 -->
+<section id="done" class="hidden">
+  <div class="ck">✓</div>
+  <h2 id="doneMsg">신청이 완료되었습니다</h2>
+  <div class="sub" style="color:#777">감사합니다. 함께 섬기게 되어 기쁩니다.</div>
+  <button id="againBtn">처음으로</button>
+</section>
+
+<script>
+/* ▼▼▼ 여기에 구글 Apps Script 웹 앱 주소(…/exec)를 붙여넣으세요 ▼▼▼ */
+var API_URL = 'https://script.google.com/macros/s/여기에_웹앱_ID를_붙여넣기/exec';
+/* ▲▲▲ ─────────────────────────────────────────────── ▲▲▲ */
+
+var APP_VERSION = 'v4-2026-11-18';
+var CONFIG = null, entered = false, cacheKey = 'woorineun_sayeok_config_v3';
+
+function esc(s){ return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+function $(id){ return document.getElementById(id); }
+
+/* 설정 적용 */
+function setYearTexts(year){
+  $('gateTitle').textContent = year + '년 사역신청서';
+  $('formTitle').textContent = year + '년 사역신청서';
+  document.title = '우리는교회 ' + year + '년 사역신청서';
+}
+function showVersion(cfg){
+  var sv = cfg && cfg.version ? cfg.version : '(예전 버전)';
+  var t = '화면 ' + APP_VERSION + ' · 서버 ' + sv;
+  $('verText').textContent = t; $('formVer').textContent = t;
+  $('verWarn').innerHTML = (sv !== APP_VERSION)
+    ? '<div class="ver-warn">⚠ 구글 시트(Apps Script)의 코드가 예전 버전입니다.<br>Code.gs를 새 파일로 덮어쓰고 <u>배포 → 배포 관리 → 새 버전</u>으로 다시 배포해 주세요. (사역모습 사진·관리자 기능이 일부 사역에서 동작하지 않을 수 있습니다)</div>'
+    : '';
+}
+function applyConfig(cfg){
+  CONFIG = cfg;
+  setYearTexts(cfg.year);
+  buildForm(cfg);
+  var b = $('enterBtn'); b.textContent = '우리는교회 사역신청서'; b.disabled = false;
+}
+
+/* 설정 불러오기: 저장해 둔 값이 있으면 바로 보여주고, 뒤에서 최신값으로 갱신 */
+function loadConfig(){
+  if (API_URL.indexOf('여기에') >= 0){
+    $('enterBtn').textContent = 'API_URL 설정이 필요합니다'; return;
+  }
+  fetch(API_URL + '?action=config')
+    .then(function(r){ return r.json(); })
+    .then(function(cfg){
+      if (!cfg || !cfg.groups) throw new Error('bad');
+      try { localStorage.setItem(cacheKey, JSON.stringify(cfg)); } catch(e){}
+      showVersion(cfg);
+      if (!CONFIG || !entered) applyConfig(cfg);          // 아직 입장 전이면 화면 갱신
+      else { CONFIG.year = cfg.year; setYearTexts(cfg.year); }  // 입력 중이면 연도만 갱신
+    })
+    .catch(function(){
+      if (!CONFIG){ var b = $('enterBtn'); b.textContent = '불러오기 실패 - 눌러서 다시 시도'; b.disabled = false; }
+    });
+}
+(function(){
+  try { var c = JSON.parse(localStorage.getItem(cacheKey) || 'null'); if (c && c.groups) applyConfig(c); } catch(e){}
+  loadConfig();
+})();
+
+/* 입장 (비밀번호 없음) */
+$('enterBtn').addEventListener('click', function(){
+  if (!CONFIG){ this.textContent = '불러오는 중...'; this.disabled = true; loadConfig(); return; }
+  entered = true;
+  $('gate').classList.add('hidden');
+  $('formPage').classList.remove('hidden');
+  $('bar').classList.remove('hidden');
+  window.scrollTo(0,0);
+});
+
+/* 폼 만들기 */
+function buildForm(cfg){
+  var html = '';
+  cfg.groups.forEach(function(g){
+    html += '<div class="group-head"><h3>'+esc(g.group)+'</h3><small>'+esc(g.note||'')+'</small></div>';
+    g.items.forEach(function(it){
+      html += '<div class="ministry" data-id="'+esc(it.id)+'">'
+        + '<div class="m-row"><label class="m-top"><input type="checkbox" class="apply">'
+        + '<span><span class="m-name">'+esc(it.name)+'</span>'
+        + (it.info ? '<br><span class="m-info">'+esc(it.info)+'</span>' : '')
+        + '</span></label>'
+        + ((it.gallery !== false) ? '<button type="button" class="gal-btn" data-id="'+esc(it.id)+'" data-name="'+esc(it.name)+'">사역모습</button>' : '')
+        + '</div>';
+      if (it.contents || it.types){
+        html += '<div class="m-detail">';
+        if (it.contents){
+          html += '<div class="sub">'+esc(it.contentsLabel||'사역 내용')+' (복수 선택 가능)</div><div class="chips">';
+          it.contents.forEach(function(c){
+            html += '<label class="chip"><input type="checkbox" class="content" value="'+esc(c)+'"><span>'+esc(c)+'</span></label>';
+          });
+          html += '</div>';
+        }
+        if (it.types){
+          html += '<div class="sub">사역 타입</div><div class="chips">';
+          it.types.forEach(function(t){
+            html += '<label class="chip"><input type="radio" class="type" name="type_'+esc(it.id)+'" value="'+esc(t)+'"><span>'+esc(t)+'</span></label>';
+          });
+          html += '</div>';
+        }
+        html += '</div>';
+      }
+      html += '</div>';
+    });
+  });
+  $('groups').innerHTML = html;
+
+  Array.prototype.forEach.call(document.querySelectorAll('.ministry'), function(m){
+    m.querySelector('.apply').addEventListener('change', function(){
+      m.classList.toggle('on', this.checked);
+      updateCount();
+    });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.gal-btn'), function(b){
+    b.addEventListener('click', function(){ openGallery(b.getAttribute('data-id'), b.getAttribute('data-name')); });
+  });
+}
+
+function updateCount(){
+  $('cnt').textContent = document.querySelectorAll('.ministry .apply:checked').length;
+}
+
+function showErr(msg){
+  var e = $('err'); e.textContent = msg; e.style.display = msg ? 'block' : 'none';
+  if (msg) e.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+/* 제출 */
+$('submitBtn').addEventListener('click', function(){
+  showErr('');
+  var name = $('name').value.trim(), phone = $('phone').value.trim();
+  if (!name){ showErr('성명을 입력해 주세요.'); $('name').focus(); return; }
+  if (!phone){ showErr('연락처를 입력해 주세요.'); $('phone').focus(); return; }
+
+  var picks = {}, total = 0, problem = '';
+  CONFIG.groups.forEach(function(g){ g.items.forEach(function(it){
+    var m = document.querySelector('.ministry[data-id="'+it.id+'"]');
+    if (!m.querySelector('.apply').checked) return;
+    total++;
+    var contents = Array.prototype.map.call(m.querySelectorAll('.content:checked'), function(x){return x.value;});
+    var typeEl = m.querySelector('.type:checked');
+    if (it.contents && !contents.length && !problem) problem = '['+it.name+'] '+(it.contentsLabel||'사역 내용')+'을(를) 선택해 주세요.';
+    if (it.types && !typeEl && !problem) problem = '['+it.name+'] 사역 타입(매주/월 2회/월 1회)을 선택해 주세요.';
+    picks[it.id] = {apply:true, contents:contents, type: typeEl ? typeEl.value : ''};
+  });});
+
+  var etc = $('etc').value.trim();
+  if (problem){ showErr(problem); return; }
+  if (!total && !etc){ showErr('신청할 사역을 하나 이상 선택해 주세요.'); return; }
+
+  var b = $('submitBtn'); b.disabled = true; b.textContent = '저장 중...';
+  var bap = document.querySelector('input[name=baptism]:checked');
+  var nf  = document.querySelector('input[name=newFamily]:checked');
+  var payload = {name:name, phone:phone, baptism:bap?bap.value:'', newFamily:nf?nf.value:'', picks:picks, etc:etc};
+  fetch(API_URL, { method:'POST', body: JSON.stringify(payload), redirect:'follow' })
+    .then(function(r){ return r.json(); })
+    .then(function(r){
+      b.disabled = false; b.textContent = '신청하기';
+      if (!r || !r.ok){ showErr((r && r.error) ? r.error : '저장 중 오류가 발생했습니다. 다시 시도해 주세요.'); return; }
+      $('formPage').classList.add('hidden'); $('bar').classList.add('hidden');
+      $('doneMsg').textContent = r.updated ? '신청 내용이 수정되었습니다' : '신청이 완료되었습니다';
+      $('done').classList.remove('hidden'); window.scrollTo(0,0);
+    })
+    .catch(function(){
+      b.disabled = false; b.textContent = '신청하기';
+      showErr('저장 중 오류가 발생했습니다. 인터넷 연결을 확인하고 다시 시도해 주세요.');
+    });
+});
+
+$('againBtn').addEventListener('click', function(){ location.reload(); });
+
+/* ───────── 사역별 신청 현황 (인원수만) ───────── */
+$('statBtn').addEventListener('click', function(){
+  $('stat').classList.remove('hidden'); document.body.style.overflow = 'hidden';
+  $('statBody').innerHTML = '<div class="gal-msg">불러오는 중...</div>';
+  fetch(API_URL + '?action=stats&_=' + Date.now())
+    .then(function(r){ return r.json(); })
+    .then(function(r){ if (!r || !r.ok) throw new Error('bad'); renderStats(r.stats); })
+    .catch(function(){ $('statBody').innerHTML = '<div class="gal-msg">신청 현황을 불러오지 못했습니다.<br>잠시 후 다시 눌러 주세요.</div>'; });
+});
+function renderStats(s){
+  var max = 1;
+  s.groups.forEach(function(g){ g.items.forEach(function(it){ if (it.count > max) max = it.count; }); });
+  var h = '<div class="stat-sum"><b>' + esc(s.year) + '년</b> 신청자 총 <b>' + esc(s.total) + '명</b></div>';
+  s.groups.forEach(function(g){
+    h += '<div class="stat-g">' + esc(g.group) + '</div>';
+    g.items.forEach(function(it){
+      h += '<div class="stat-row"><span class="stat-n">' + esc(it.name) + '</span><span class="stat-bar"><i style="width:' + Math.round(it.count / max * 100) + '%"></i></span><span class="stat-c">' + esc(it.count) + '명</span></div>';
+    });
+  });
+  h += '<div class="stat-row"><span class="stat-n">기타 희망 사역</span><span class="stat-bar"><i style="width:' + Math.round(s.etc / max * 100) + '%"></i></span><span class="stat-c">' + esc(s.etc) + '명</span></div>';
+  h += '<div class="stat-note">※ 한 사람이 여러 사역에 신청할 수 있어, 사역별 인원을 모두 더하면 신청자 수보다 많을 수 있습니다.</div>';
+  $('statBody').innerHTML = h;
+}
+$('statClose').addEventListener('click', function(){ $('stat').classList.add('hidden'); document.body.style.overflow = ''; });
+
+/* ───────── 관리자모드: 구글 시트 신청 목록 ───────── */
+var adm = { pw: null, data: null, tab: 'p', q: '' };
+$('admBtn').addEventListener('click', function(){
+  $('adp').classList.remove('hidden'); document.body.style.overflow = 'hidden';
+  adm = { pw: null, data: null, tab: 'p', q: '' };
+  renderAdminLogin('');
+});
+$('adpClose').addEventListener('click', function(){
+  $('adp').classList.add('hidden'); document.body.style.overflow = '';
+  adm = { pw: null, data: null, tab: 'p', q: '' }; $('adpBody').innerHTML = '';   // 닫으면 목록을 지움
+});
+function renderAdminLogin(msg){
+  $('adpBody').innerHTML = '<div class="login"><b style="font-size:18px">관리자 비밀번호</b><input type="password" id="admPw" autocomplete="current-password" placeholder="비밀번호">'
+    + '<div class="msg" id="admMsg">' + esc(msg) + '</div><button type="button" id="admGo">확인</button></div>';
+  var go = function(){
+    var pw = $('admPw').value; if (!pw) return;
+    var b = $('admGo'); b.disabled = true; $('admMsg').textContent = '확인 중...';
+    loadApplications(pw).catch(function(e){ renderAdminLogin(e.message); });
+  };
+  $('admGo').addEventListener('click', go);
+  $('admPw').addEventListener('keydown', function(e){ if (e.key === 'Enter') go(); });
+  $('admPw').focus();
+}
+function loadApplications(pw){
+  return apiPost({ action:'listApplications', pw:pw }).then(function(r){ adm.pw = pw; adm.data = r; renderAdminList(); });
+}
+function renderAdminList(){
+  var d = adm.data;
+  $('adpBody').innerHTML =
+    '<div class="stat-sum"><b>' + esc(d.year) + '년</b> 신청자 총 <b>' + esc(d.rows.length) + '명</b></div>'
+    + '<div class="tools"><input type="search" id="admQ" placeholder="이름·연락처·사역 검색" value="' + esc(adm.q) + '">'
+    + '<a href="' + esc(d.sheetUrl) + '" target="_blank" rel="noopener">구글 시트 열기</a><button type="button" id="admRef">새로고침</button></div>'
+    + '<div class="tabs"><button type="button" data-t="p" class="' + (adm.tab === 'p' ? 'on' : '') + '">신청자별</button>'
+    + '<button type="button" data-t="m" class="' + (adm.tab === 'm' ? 'on' : '') + '">사역별 명단</button></div><div id="admList"></div>';
+  $('admQ').addEventListener('input', function(){ adm.q = this.value; renderAdminRows(); });
+  $('admRef').addEventListener('click', function(){ this.disabled = true; loadApplications(adm.pw).catch(function(e){ alert(e.message); }); });
+  Array.prototype.forEach.call($('adpBody').querySelectorAll('.tabs button'), function(b){
+    b.addEventListener('click', function(){ adm.tab = b.getAttribute('data-t'); renderAdminList(); });
+  });
+  renderAdminRows();
+}
+function renderAdminRows(){
+  var d = adm.data, H = d.headers, q = adm.q.trim().toLowerCase(), last = H.length - 1, out = '';
+  var rows = d.rows.filter(function(r){ return !q || r.join(' ').toLowerCase().indexOf(q) >= 0; });
+  if (!rows.length){ $('admList').innerHTML = '<div class="gal-msg">' + (d.rows.length ? '검색 결과가 없습니다.' : '아직 신청이 없습니다.') + '</div>'; return; }
+  if (adm.tab === 'p'){
+    rows.forEach(function(r){
+      var li = '';
+      for (var i = 6; i < last; i++) if (r[i]) li += '<li><b>' + esc(H[i]) + '</b> : ' + esc(r[i]) + '</li>';
+      if (r[last]) li += '<li><b>기타 희망 사역</b> : ' + esc(r[last]) + '</li>';
+      out += '<div class="pc"><div class="pc-h"><b>' + esc(r[2]) + '</b><span>' + esc(r[3]) + '</span></div>'
+          + '<div class="pc-m">세례 ' + esc(r[4] || '-') + ' · 새가족교육 ' + esc(r[5] || '-') + ' · ' + esc(r[0]) + '</div>'
+          + (li ? '<ul>' + li + '</ul>' : '') + '</div>';
+    });
+  } else {
+    for (var i = 6; i <= last; i++){
+      var who = [];
+      rows.forEach(function(r){ if (r[i]) who.push(esc(r[2]) + (i < last && r[i] !== '신청' ? ' <small>(' + esc(r[i]) + ')</small>' : '')); });
+      if (!who.length) continue;
+      out += '<div class="mg"><b>' + esc(H[i]) + '</b> <span class="cnt">' + who.length + '명</span><div>' + who.join(' · ') + '</div></div>';
+    }
+    if (!out) out = '<div class="gal-msg">표시할 신청이 없습니다.</div>';
+  }
+  $('admList').innerHTML = out;
+}
+
+/* ───────── 사역모습 사진 ───────── */
+var galCache = {}, curPhotos = [], curIdx = 0, curGalId = '', adminPw = null, adminNote = '';
+function thumbUrl(id, w){ return 'https://drive.google.com/thumbnail?id=' + encodeURIComponent(id) + '&sz=w' + w; }
+
+function apiPost(obj){
+  return fetch(API_URL, { method:'POST', body: JSON.stringify(obj), redirect:'follow' })
+    .then(function(r){ return r.json(); })
+    .then(function(r){ if (!r || !r.ok) throw new Error((r && r.error) || '오류가 발생했습니다.'); return r; });
+}
+
+function openGallery(id, name){
+  curGalId = id;
+  $('galTitle').textContent = name + ' 사역모습';
+  $('gal').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  if (galCache[id]) renderGallery(galCache[id]);
+  else $('galBody').innerHTML = '<div class="gal-msg">사진을 불러오는 중...</div>';
+  fetchGallery(id);
+}
+
+function fetchGallery(id){
+  fetch(API_URL + '?action=photos&id=' + encodeURIComponent(id) + '&_=' + Date.now())
+    .then(function(r){ return r.json(); })
+    .then(function(r){
+      if (!r || !r.ok) throw new Error((r && r.error) || 'bad');
+      galCache[id] = r.photos;
+      if (curGalId === id) renderGallery(r.photos);
+    })
+    .catch(function(){
+      if (!galCache[id]) $('galBody').innerHTML = '<div class="gal-msg">사진을 불러오지 못했습니다.<br>잠시 후 다시 눌러 주세요.</div>';
+    });
+}
+
+function renderGallery(photos){
+  curPhotos = photos;
+  var body = $('galBody'), html = '';
+  if (adminPw){
+    html += '<div class="adm"><label class="up-btn">+ 사진 올리기<input type="file" id="upInput" accept="image/*" multiple hidden></label>'
+          + '<span id="upMsg">' + esc(adminNote || '관리자 모드: 사진 올리기 · 설명 · 삭제를 할 수 있습니다.') + '</span></div>';
+  }
+  if (!photos.length) html += '<div class="gal-msg">아직 등록된 사진이 없습니다.</div>';
+  else html += photos.map(function(p, i){
+    return '<div class="th" role="button" tabindex="0" data-i="'+i+'"><div class="ph"><img loading="lazy" alt="" src="'+thumbUrl(p.id, 500)+'"></div>'
+         + (p.caption ? '<span>'+esc(p.caption)+'</span>' : '')
+         + (adminPw ? '<div class="adm-row"><button type="button" data-act="cap">설명</button><button type="button" class="del" data-act="del">삭제</button></div>' : '')
+         + '</div>';
+  }).join('');
+  body.innerHTML = html;
+  Array.prototype.forEach.call(body.querySelectorAll('.th'), function(t){
+    t.addEventListener('click', function(e){
+      var i = parseInt(t.getAttribute('data-i'), 10), btn = e.target.closest ? e.target.closest('button') : null;
+      if (btn){ e.stopPropagation(); adminPhotoAction(btn.getAttribute('data-act'), curPhotos[i]); return; }
+      showPhoto(i);
+    });
+  });
+  var up = $('upInput');
+  if (up) up.addEventListener('change', function(){ if (this.files && this.files.length) uploadFiles(this.files); this.value = ''; });
+}
+
+/* ───────── 관리자: 사진 올리기 / 설명 / 삭제 ───────── */
+function resizeImage(file, maxSide){
+  return new Promise(function(res, rej){
+    var url = URL.createObjectURL(file), img = new Image();
+    img.onload = function(){
+      var w = img.naturalWidth, h = img.naturalHeight, sc = Math.min(1, maxSide / Math.max(w, h));
+      var c = document.createElement('canvas'); c.width = Math.round(w * sc); c.height = Math.round(h * sc);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      res(c.toDataURL('image/jpeg', 0.85).split(',')[1]);
+    };
+    img.onerror = function(){ URL.revokeObjectURL(url); rej(new Error('이미지를 읽을 수 없습니다.')); };
+    img.src = url;
+  });
+}
+function two(n){ return (n < 10 ? '0' : '') + n; }
+function stamp(i){
+  var d = new Date();
+  return d.getFullYear() + two(d.getMonth()+1) + two(d.getDate()) + '_' + two(d.getHours()) + two(d.getMinutes()) + two(d.getSeconds()) + '_' + two(i+1);
+}
+function refreshGallery(){ delete galCache[curGalId]; fetchGallery(curGalId); }
+
+function uploadFiles(files){
+  var list = Array.prototype.slice.call(files), id = curGalId, ok = 0, fail = 0, lastErr = '';
+  function next(i){
+    if (i >= list.length){
+      adminNote = '완료: ' + ok + '장 올렸습니다.' + (fail ? ' (실패 ' + fail + '장: ' + lastErr + ')' : '');
+      refreshGallery(); return;
+    }
+    var m = $('upMsg'); if (m) m.textContent = '올리는 중... (' + (i+1) + '/' + list.length + ')';
+    resizeImage(list[i], 1600)
+      .then(function(b64){ return apiPost({ action:'uploadPhoto', pw:adminPw, id:id, filename:stamp(i)+'.jpg', mime:'image/jpeg', data:b64 }); })
+      .then(function(){ ok++; })
+      .catch(function(e){ fail++; lastErr = e.message; })
+      .then(function(){ next(i + 1); });
+  }
+  next(0);
+}
+
+function adminPhotoAction(act, p){
+  if (!p) return;
+  if (act === 'del'){
+    if (!confirm('이 사진을 삭제할까요?')) return;
+    apiPost({ action:'deletePhoto', pw:adminPw, id:curGalId, fileId:p.id })
+      .then(function(){ adminNote = '사진을 삭제했습니다.'; refreshGallery(); })
+      .catch(function(e){ alert(e.message); });
+  } else if (act === 'cap'){
+    var t = prompt('사진 설명을 입력하세요 (비우면 설명 삭제)', p.caption || '');
+    if (t === null) return;
+    apiPost({ action:'setCaption', pw:adminPw, id:curGalId, fileId:p.id, caption:t })
+      .then(function(){ adminNote = '설명을 저장했습니다.'; refreshGallery(); })
+      .catch(function(e){ alert(e.message); });
+  }
+}
+
+$('galAdmin').addEventListener('click', function(){
+  var btn = this;
+  if (adminPw){ adminPw = null; adminNote = ''; btn.textContent = '관리자'; renderGallery(curPhotos); return; }
+  var pw = prompt('관리자 비밀번호를 입력하세요');
+  if (!pw) return;
+  btn.disabled = true;
+  apiPost({ action:'adminCheck', pw:pw })
+    .then(function(){ adminPw = pw; adminNote = ''; btn.textContent = '관리 종료'; renderGallery(curPhotos); })
+    .catch(function(e){ alert(e.message); })
+    .then(function(){ btn.disabled = false; });
+});
+
+function showPhoto(i){
+  if (!curPhotos.length) return;
+  curIdx = (i + curPhotos.length) % curPhotos.length;
+  var p = curPhotos[curIdx];
+  $('lbImg').src = thumbUrl(p.id, 1400);
+  $('lbCap').textContent = (p.caption ? p.caption + '  ' : '') + '(' + (curIdx + 1) + '/' + curPhotos.length + ')';
+  $('lb').classList.remove('hidden');
+}
+function closeGallery(){ $('gal').classList.add('hidden'); document.body.style.overflow = ''; adminPw = null; adminNote = ''; $('galAdmin').textContent = '관리자'; }
+function closeLb(){ $('lb').classList.add('hidden'); $('lbImg').removeAttribute('src'); }
+
+$('galClose').addEventListener('click', closeGallery);
+$('lbX').addEventListener('click', closeLb);
+$('lbP').addEventListener('click', function(){ showPhoto(curIdx - 1); });
+$('lbN').addEventListener('click', function(){ showPhoto(curIdx + 1); });
+$('lb').addEventListener('click', function(e){ if (e.target === this) closeLb(); });
+document.addEventListener('keydown', function(e){
+  if (!$('lb').classList.contains('hidden')){
+    if (e.key === 'Escape') closeLb();
+    else if (e.key === 'ArrowLeft') showPhoto(curIdx - 1);
+    else if (e.key === 'ArrowRight') showPhoto(curIdx + 1);
+  } else if (e.key === 'Escape' && !$('gal').classList.contains('hidden')) closeGallery();
+});
+(function(){
+  var x0 = null;
+  $('lb').addEventListener('touchstart', function(e){ x0 = e.touches[0].clientX; }, {passive:true});
+  $('lb').addEventListener('touchend', function(e){
+    if (x0 === null) return;
+    var dx = e.changedTouches[0].clientX - x0; x0 = null;
+    if (Math.abs(dx) > 50) showPhoto(curIdx + (dx < 0 ? 1 : -1));
+  });
+})();
+</script>
+</body>
+</html>

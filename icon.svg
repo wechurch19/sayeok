@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs><clipPath id="c"><rect width="512" height="512" rx="112"/></clipPath></defs>
+  <g clip-path="url(#c)">
+    <rect width="512" height="512" fill="#FFB400"/>
+    <rect y="0" width="512" height="84" fill="#141414"/>
+    <rect y="428" width="512" height="84" fill="#141414"/>
+    <rect x="22" y="29" width="30" height="26" rx="5" fill="#FFB400"/><rect x="78" y="29" width="30" height="26" rx="5" fill="#FFB400"/><rect x="134" y="29" width="30" height="26" rx="5" fill="#FFB400"/><rect x="190" y="29" width="30" height="26" rx="5" fill="#FFB400"/><rect x="246" y="29" width="30" height="26" rx="5" fill="#FFB400"/><rect x="302" y="29" width="30" height="26" rx="5" fill="#FFB400"/><rect x="358" y="29" width="30" height="26" rx="5" fill="#FFB400"/><rect x="414" y="29" width="30" height="26" rx="5" fill="#FFB400"/><rect x="470" y="29" width="30" height="26" rx="5" fill="#FFB400"/><rect x="22" y="457" width="30" height="26" rx="5" fill="#FFB400"/><rect x="78" y="457" width="30" height="26" rx="5" fill="#FFB400"/><rect x="134" y="457" width="30" height="26" rx="5" fill="#FFB400"/><rect x="190" y="457" width="30" height="26" rx="5" fill="#FFB400"/><rect x="246" y="457" width="30" height="26" rx="5" fill="#FFB400"/><rect x="302" y="457" width="30" height="26" rx="5" fill="#FFB400"/><rect x="358" y="457" width="30" height="26" rx="5" fill="#FFB400"/><rect x="414" y="457" width="30" height="26" rx="5" fill="#FFB400"/><rect x="470" y="457" width="30" height="26" rx="5" fill="#FFB400"/>
+    <path d="M226 128H286V200H358V262H286V384H226V262H154V200H226Z" fill="#E31B23" stroke="#141414" stroke-width="16" stroke-linejoin="round"/>
+  </g>
+</svg>
